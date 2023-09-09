@@ -1,19 +1,29 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 import { ERROR_MESSAGES } from '../constants/apiMessages';
 import { HTTP_STATUS, HTTP_STATUS_CODE } from '../constants/httpCodes';
+import { appDataSource } from '../data-source';
 import { Category } from '../entities/category';
 import { CustomRequest } from '../types';
 
 export const getCategories = async (
-  _: Request,
+  req: CustomRequest,
   res: Response,
 ): Promise<void> => {
-  // TODO: get user categories
+  const userId = req?.user?.user_id as string;
+
+  const categories = await appDataSource
+    .getRepository(Category)
+    .createQueryBuilder('category')
+    .select()
+    .where('category.user_id = :user_id', { user_id: userId })
+    .orWhere('category.user_id IS NULL')
+    .getMany();
+
   res.json({
     status: HTTP_STATUS.SUCCESS,
     data: {
-      categories: await Category.find(),
+      categories,
     },
   });
 };
