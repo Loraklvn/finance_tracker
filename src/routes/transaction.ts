@@ -6,6 +6,8 @@ import {
   createTransaction,
   deleteTransaction,
   getTransactions,
+  getTransactionsSummary,
+  getTransactionsSummaryByCategory,
   updateTransaction,
 } from '../controllers/transaction';
 import validateFields from '../middlewares/validateFields';
@@ -56,5 +58,24 @@ transactionRouter.put(
 );
 
 transactionRouter.delete(`${PATH_TRANSACTION}/:id`, deleteTransaction);
+
+transactionRouter.get(
+  `${PATH_TRANSACTION}/summary`,
+  validateFields([
+    query('startDate').isISO8601().toDate(),
+    query('endDate').isISO8601().toDate(),
+  ]),
+
+  getTransactionsSummary,
+);
+
+transactionRouter.get(
+  `${PATH_TRANSACTION}/summary/category`,
+  validateFields([
+    query('startDate').isISO8601().toDate(),
+    query('endDate').isISO8601().toDate(),
+  ]),
+  getTransactionsSummaryByCategory,
+);
 
 export default transactionRouter;

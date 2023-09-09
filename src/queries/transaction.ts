@@ -81,3 +81,44 @@ export const buildGetTransactionsSummaryQuery = (
 
   return queryBuilder;
 };
+
+type TransactionSummaryByCategoryQueryParams = {
+  userId: string;
+  startDate?: string;
+  endDate?: string;
+  type: string;
+};
+
+/**
+ * Builds a query for summarizing transactions by category based on specified criteria.
+ * @param transactionRepository - The repository for the Transaction entity.
+ * @param params - The query parameters.
+ * @returns A SelectQueryBuilder for executing the transaction summary by category query.
+ */
+export const buildGetTransactionsSummaryByCategoryQuery = (
+  transactionRepository: Repository<Transaction>,
+  { userId, startDate, endDate, type }: TransactionSummaryByCategoryQueryParams,
+): SelectQueryBuilder<Transaction> => {
+  const queryBuilder = transactionRepository
+    .createQueryBuilder('transaction')
+    .select([
+      'transaction.category_id AS category_id',
+      'category.description AS category',
+      'transaction.type AS type',
+      'SUM(transaction.amount) AS total',
+    ])
+    .leftJoin('transaction.category', 'category')
+    .where('transaction.user_id = :userId', { userId })
+    .andWhere('transaction.type = :type', { type });
+
+  if (startDate) {
+    queryBuilder.andWhere('transaction.date >= :startDate', { startDate });
+  }
+  if (endDate) {
+    queryBuilder.andWhere('transaction.date <= :endDate', { endDate });
+  }
+
+  queryBuilder.groupBy('category.category_id');
+
+  return queryBuilder;
+};
