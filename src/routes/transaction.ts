@@ -18,7 +18,7 @@ transactionRouter.get(
     query('page').optional().isInt(),
     query('pageSize').optional().isInt(),
     query('startDate').optional().isISO8601().toDate(),
-    query('endDate').optional().isDate(),
+    query('endDate').optional().isISO8601().toDate(),
   ]),
   getTransactions,
 );
