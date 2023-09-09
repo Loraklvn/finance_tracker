@@ -1,10 +1,11 @@
 import { Router } from 'express';
 
-import userRouter from './user';
-import categoryRouter from './category';
 import { authChecker } from '../middlewares/authChecker';
 import { errorHandler } from '../middlewares/errorHandler';
+
+import categoryRouter from './category';
 import transactionRouter from './transaction';
+import userRouter from './user';
 
 const routers = [userRouter, categoryRouter, transactionRouter];
 

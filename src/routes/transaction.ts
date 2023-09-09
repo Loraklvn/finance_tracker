@@ -1,4 +1,7 @@
 import { Router } from 'express';
+import { body, query } from 'express-validator';
+
+import { PATH_TRANSACTION } from '../constants/paths';
 import {
   createTransaction,
   deleteTransaction,
@@ -6,9 +9,7 @@ import {
   updateTransaction,
 } from '../controllers/transaction';
 import validateFields from '../middlewares/validateFields';
-import { body, query } from 'express-validator';
 import { TransactionTypes } from '../types/transaction';
-import { PATH_TRANSACTION } from '../constants/paths';
 
 const transactionRouter: Router = Router();
 
@@ -23,7 +24,7 @@ transactionRouter.get(
   getTransactions,
 );
 
-const validateTypeEnum = (value: TransactionTypes) => {
+const validateTypeEnum = (value: TransactionTypes): boolean => {
   if (!Object.values(TransactionTypes).includes(value)) {
     throw new Error('Invalid type value');
   }
