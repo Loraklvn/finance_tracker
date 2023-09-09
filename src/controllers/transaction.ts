@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
 
 import { MAX_PAGE_SIZE } from '../constants';
 import { ERROR_MESSAGES } from '../constants/apiMessages';
@@ -8,9 +8,11 @@ import { appDataSource } from '../data-source';
 import { Transaction } from '../entities/transaction';
 import {
   buildGetTransactionsQuery,
+  buildGetTransactionsSummaryByCategoryQuery,
   buildGetTransactionsSummaryQuery,
 } from '../queries/transaction';
 import { CustomRequest } from '../types';
+import { TransactionTypes } from '../types/transaction';
 
 export const getTransactions = async (
   req: CustomRequest,
@@ -144,4 +146,78 @@ export const deleteTransaction = async (
       transaction,
     },
   });
+};
+
+export const getTransactionsSummary = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req?.user?.user_id as string;
+    const { startDate, endDate } = req.query;
+
+    const transactionRepository = appDataSource.getRepository(Transaction);
+
+    const summaryQuery = buildGetTransactionsSummaryQuery(
+      transactionRepository,
+      {
+        userId,
+        startDate: startDate as string,
+        endDate: endDate as string,
+      },
+    );
+    const summary = await summaryQuery.getRawOne();
+
+    res.json({
+      status: HTTP_STATUS.SUCCESS,
+      data: {
+        ...summary,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTransactionsSummaryByCategory = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userId = req?.user?.user_id as string;
+    const { startDate, endDate } = req.query;
+
+    const transactionRepository = appDataSource.getRepository(Transaction);
+
+    const params = {
+      userId,
+      startDate: startDate as string,
+      endDate: endDate as string,
+    };
+
+    const summaryExpensesQuery = buildGetTransactionsSummaryByCategoryQuery(
+      transactionRepository,
+      { type: TransactionTypes.EXPENSE, ...params },
+    );
+    const summaryExpenses = await summaryExpensesQuery.getRawMany();
+
+    const summaryIncomeQuery = buildGetTransactionsSummaryByCategoryQuery(
+      transactionRepository,
+      { type: TransactionTypes.INCOME, ...params },
+    );
+
+    const summaryIncome = await summaryIncomeQuery.getRawMany();
+
+    res.json({
+      status: HTTP_STATUS.SUCCESS,
+      data: {
+        expenses: summaryExpenses,
+        income: summaryIncome,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };

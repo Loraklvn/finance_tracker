@@ -1,7 +1,6 @@
 import { Router } from 'express';
 
 import { authChecker } from '../middlewares/authChecker';
-import { errorHandler } from '../middlewares/errorHandler';
 
 import categoryRouter from './category';
 import transactionRouter from './transaction';
@@ -22,8 +21,6 @@ mainRouter.use((req, res, next) => {
 
   authChecker(req, res, next);
 });
-
-mainRouter.use(errorHandler);
 
 mainRouter.use(routers);
 
