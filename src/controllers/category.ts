@@ -8,6 +8,7 @@ export const getCategories = async (
   _: Request,
   res: Response,
 ): Promise<void> => {
+  // TODO: get user categories
   res.json({
     status: HTTP_STATUS.SUCCESS,
     data: {
