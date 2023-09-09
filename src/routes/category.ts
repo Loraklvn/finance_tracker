@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
+
 import { PATH_CATEGORY } from '../constants/paths';
 import { createUserCategory, getCategories } from '../controllers/category';
 import validateFields from '../middlewares/validateFields';

@@ -8,7 +8,10 @@ import { appDataSource } from '../data-source';
 import { Transaction } from '../entities/transaction';
 import { CustomRequest } from '../types';
 
-export const getTransactions = async (req: CustomRequest, res: Response) => {
+export const getTransactions = async (
+  req: CustomRequest,
+  res: Response,
+): Promise<void> => {
   const userId = req?.user?.user_id as string;
 
   const { page = 1, pageSize = 10, startDate, endDate } = req.query;
@@ -55,13 +58,13 @@ export const createTransaction = async (
 ): Promise<void> => {
   const userId = req?.user?.user_id as string;
 
-  const { amount, note, type, category_id, date } = req.body;
+  const { amount, note, type, category_id: categoryID, date } = req.body;
 
   const transaction = await Transaction.create({
     amount,
     note,
     type,
-    category_id,
+    category_id: categoryID,
     user_id: parseInt(userId),
     date,
   }).save();

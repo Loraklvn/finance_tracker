@@ -1,4 +1,3 @@
-import { TransactionTypes } from '../types/transaction';
 import {
   BaseEntity,
   Column,
@@ -9,6 +8,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { TransactionTypes } from '../types/transaction';
+
 import { User } from './user';
 
 @Entity()

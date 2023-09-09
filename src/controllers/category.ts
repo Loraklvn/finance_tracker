@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+
 import { ERROR_MESSAGES } from '../constants/apiMessages';
 import { HTTP_STATUS, HTTP_STATUS_CODE } from '../constants/httpCodes';
 import { Category } from '../entities/category';
@@ -21,9 +22,9 @@ export const createUserCategory = async (
   req: CustomRequest,
   res: Response,
 ): Promise<void> => {
-  const { user_id } = req?.user || {};
+  const userId = req?.user?.user_id as string;
 
-  if (!user_id) {
+  if (!userId) {
     res.status(HTTP_STATUS_CODE.UNAUTHORIZED).json({
       status: HTTP_STATUS.ERROR,
       message: ERROR_MESSAGES.NOT_AUTHORIZED,
@@ -37,7 +38,7 @@ export const createUserCategory = async (
     value,
     description,
     type,
-    user_id: parseInt(user_id),
+    user_id: parseInt(userId),
   }).save();
 
   res.json({

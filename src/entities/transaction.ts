@@ -1,4 +1,3 @@
-import { TransactionTypes } from '../types/transaction';
 import {
   BaseEntity,
   Column,
@@ -9,8 +8,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user';
+
+import { TransactionTypes } from '../types/transaction';
+
 import { Category } from './category';
+import { User } from './user';
 
 @Entity()
 export class Transaction extends BaseEntity {
