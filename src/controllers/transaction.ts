@@ -6,6 +6,10 @@ import { HTTP_STATUS, HTTP_STATUS_CODE } from '../constants/httpCodes';
 import { TRANSACTION_ALLOWED_UPDATE_FIELDS } from '../constants/transaction';
 import { appDataSource } from '../data-source';
 import { Transaction } from '../entities/transaction';
+import {
+  buildGetTransactionsQuery,
+  buildGetTransactionsSummaryQuery,
+} from '../queries/transaction';
 import { CustomRequest } from '../types';
 
 export const getTransactions = async (
@@ -13,32 +17,29 @@ export const getTransactions = async (
   res: Response,
 ): Promise<void> => {
   const userId = req?.user?.user_id as string;
-
-  const { page = 1, pageSize = 10, startDate, endDate } = req.query;
+  const { page = 1, pageSize = MAX_PAGE_SIZE, startDate, endDate } = req.query;
 
   const parsedPage = parseInt(page as string);
   const parsedPageSize = parseInt(pageSize as string);
   const validatedPageSize = Math.min(parsedPageSize, MAX_PAGE_SIZE);
 
-  const transactionRepository = await appDataSource
-    .getRepository(Transaction)
-    .createQueryBuilder('transaction')
-    .select()
-    .where('transaction.user_id = :user_id', { user_id: userId })
-    .orderBy('transaction.date', 'DESC')
-    .skip((parsedPage - 1) * validatedPageSize)
-    .take(validatedPageSize);
+  const transactionRepository = appDataSource.getRepository(Transaction);
 
-  if (startDate) {
-    transactionRepository.andWhere('transaction.date >= :startDate', {
-      startDate,
-    });
-  }
-  if (endDate) {
-    transactionRepository.andWhere('transaction.date <= :endDate', { endDate });
-  }
+  const transactionsQuery = buildGetTransactionsQuery(transactionRepository, {
+    userId,
+    page: parsedPage,
+    pageSize: validatedPageSize,
+    startDate: startDate as string,
+    endDate: endDate as string,
+  });
+  const [transactions, total] = await transactionsQuery.getManyAndCount();
 
-  const [transactions, total] = await transactionRepository.getManyAndCount();
+  const summaryQuery = buildGetTransactionsSummaryQuery(transactionRepository, {
+    userId,
+    startDate: startDate as string,
+    endDate: endDate as string,
+  });
+  const summary = await summaryQuery.getRawOne();
 
   res.json({
     status: HTTP_STATUS.SUCCESS,
@@ -47,6 +48,7 @@ export const getTransactions = async (
       pageSize: parsedPageSize,
       currentPage: parsedPage,
       totalPages: parseInt(`${Math.ceil(total / validatedPageSize)}`),
+      ...summary,
       transactions,
     },
   });
