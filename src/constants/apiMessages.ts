@@ -9,4 +9,5 @@ export const ERROR_MESSAGES = {
   RESERVATION_BODY_NOT_VALID: 'Invalid reservation body fields',
   NOT_AUTHORIZED: 'Your not auhtorized to use these resources.',
   TOKEN_MISSING: 'Token missing.',
+  DATE_NOT_VALID: 'Invalid date.',
 };
