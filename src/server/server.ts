@@ -21,7 +21,7 @@ export const initExpressServer = (): void => {
 
   app.use(routes);
 
-  // centralized error handler to avoid try catch in every controller
+  // centralized error handler middleware
   app.use(errorHandler);
 
   app.listen(process.env.PORT || process.env.APP_PORT);
