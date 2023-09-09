@@ -6,7 +6,7 @@ import {
   updateTransaction,
 } from '../controllers/transaction';
 import validateFields from '../middlewares/validateFields';
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 import { TransactionTypes } from '../types/transaction';
 import { PATH_TRANSACTION } from '../constants/paths';
 
@@ -15,10 +15,10 @@ const transactionRouter: Router = Router();
 transactionRouter.get(
   PATH_TRANSACTION,
   validateFields([
-    body('page').optional().isInt(),
-    body('pageSize').optional().isInt(),
-    body('startDate').optional().isDate(),
-    body('endDate').optional().isDate(),
+    query('page').optional().isInt(),
+    query('pageSize').optional().isInt(),
+    query('startDate').optional().isISO8601().toDate(),
+    query('endDate').optional().isISO8601().toDate(),
   ]),
   getTransactions,
 );
