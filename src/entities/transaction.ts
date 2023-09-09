@@ -40,7 +40,7 @@ export class Transaction extends BaseEntity {
   category_id: number;
 
   @ManyToOne(() => Category, (category) => category.category_id)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'category_id' })
   category: Category;
 
   @CreateDateColumn()

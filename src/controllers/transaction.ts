@@ -1,14 +1,15 @@
 import { Response } from 'express';
-import { MAX_PAGE_SIZE } from 'src/constants';
-import { ERROR_MESSAGES } from 'src/constants/apiMessages';
-import { HTTP_STATUS, HTTP_STATUS_CODE } from 'src/constants/httpCodes';
-import { appDataSource } from 'src/data-source';
-import { Transaction } from 'src/entities/transaction';
-import { CustomRequest } from 'src/types';
-import { validateDates, validatePageParams } from 'src/utils';
+
+import { MAX_PAGE_SIZE } from '../constants';
+import { ERROR_MESSAGES } from '../constants/apiMessages';
+import { HTTP_STATUS, HTTP_STATUS_CODE } from '../constants/httpCodes';
+import { TRANSACTION_ALLOWED_UPDATE_FIELDS } from '../constants/transaction';
+import { appDataSource } from '../data-source';
+import { Transaction } from '../entities/transaction';
+import { CustomRequest } from '../types';
 
 export const getTransactions = async (req: CustomRequest, res: Response) => {
-  const { user_id } = req?.user || {};
+  const userId = req?.user?.user_id as string;
 
   const { page = 1, pageSize = 10, startDate, endDate } = req.query;
 
@@ -16,33 +17,25 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
   const parsedPageSize = parseInt(pageSize as string);
   const validatedPageSize = Math.min(parsedPageSize, MAX_PAGE_SIZE);
 
-  if (!validatePageParams(parsedPage, validatedPageSize)) {
-    res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
-      status: HTTP_STATUS.ERROR,
-      message: ERROR_MESSAGES.PAGE_PAGESIZE_NOT_VALID,
-    });
-    return;
-  }
-
-  if (!validateDates([startDate as string, endDate as string])) {
-    res.status(HTTP_STATUS_CODE.BAD_REQUEST).json({
-      status: HTTP_STATUS.ERROR,
-      message: ERROR_MESSAGES.DATE_NOT_VALID,
-    });
-    return;
-  }
-
-  const [transactions, total] = await appDataSource
+  const transactionRepository = await appDataSource
     .getRepository(Transaction)
     .createQueryBuilder('transaction')
     .select()
-    .where('transaction.user_id = :user_id', { user_id })
-    .andWhere('transaction.date >= :startDate', { startDate })
-    .andWhere('transaction.date <= :endDate', { endDate })
+    .where('transaction.user_id = :user_id', { user_id: userId })
     .orderBy('transaction.date', 'DESC')
     .skip((parsedPage - 1) * validatedPageSize)
-    .take(validatedPageSize)
-    .getManyAndCount();
+    .take(validatedPageSize);
+
+  if (startDate) {
+    transactionRepository.andWhere('transaction.date >= :startDate', {
+      startDate,
+    });
+  }
+  if (endDate) {
+    transactionRepository.andWhere('transaction.date <= :endDate', { endDate });
+  }
+
+  const [transactions, total] = await transactionRepository.getManyAndCount();
 
   res.json({
     status: HTTP_STATUS.SUCCESS,
@@ -60,7 +53,7 @@ export const createTransaction = async (
   req: CustomRequest,
   res: Response,
 ): Promise<void> => {
-  const { user_id } = req?.user || {};
+  const userId = req?.user?.user_id as string;
 
   const { amount, note, type, category_id, date } = req.body;
 
@@ -69,9 +62,76 @@ export const createTransaction = async (
     note,
     type,
     category_id,
-    user_id: parseInt(user_id as string),
+    user_id: parseInt(userId),
     date,
   }).save();
+
+  res.json({
+    status: HTTP_STATUS.SUCCESS,
+    data: {
+      transaction,
+    },
+  });
+};
+
+export const updateTransaction = async (
+  req: CustomRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req?.user?.user_id as string;
+  const { id } = req.params;
+
+  const transaction = await Transaction.findOneBy({
+    transaction_id: parseInt(id),
+    user_id: parseInt(userId),
+  });
+
+  if (!transaction) {
+    res.status(HTTP_STATUS_CODE.NOT_FOUND).json({
+      status: HTTP_STATUS.ERROR,
+      message: ERROR_MESSAGES.TRANSACTION_NOT_FOUND,
+    });
+    return;
+  }
+
+  TRANSACTION_ALLOWED_UPDATE_FIELDS.forEach((field) => {
+    if (field in req.body) {
+      transaction[field as 'amount'] = req.body[field];
+    }
+  });
+
+  await transaction.save();
+
+  res.json({
+    status: HTTP_STATUS.SUCCESS,
+    data: {
+      transaction,
+    },
+  });
+};
+
+export const deleteTransaction = async (
+  req: CustomRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req?.user?.user_id as string;
+
+  const { id } = req.params;
+
+  const transaction = await Transaction.findOneBy({
+    transaction_id: parseInt(id),
+    user_id: parseInt(userId),
+  });
+
+  if (!transaction) {
+    res.status(HTTP_STATUS_CODE.NOT_FOUND).json({
+      status: HTTP_STATUS.ERROR,
+      message: ERROR_MESSAGES.TRANSACTION_NOT_FOUND,
+    });
+    return;
+  }
+
+  await transaction.remove();
 
   res.json({
     status: HTTP_STATUS.SUCCESS,
