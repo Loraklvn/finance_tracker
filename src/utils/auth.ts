@@ -7,7 +7,7 @@ import { User } from '../entities/user';
 export const createAccessToken = (user: User): string => {
   return sign(
     {
-      userId: user.user_id,
+      user_id: user.user_id,
       name: user.name,
       email: user.email,
     },

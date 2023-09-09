@@ -10,4 +10,6 @@ export const ERROR_MESSAGES = {
   NOT_AUTHORIZED: 'Your not auhtorized to use these resources.',
   TOKEN_MISSING: 'Token missing.',
   DATE_NOT_VALID: 'Invalid date.',
+  TRANSACTION_NOT_FOUND: 'Transaction not found.',
+  BODY_NOT_VALID: 'Invalid body fields.',
 };
