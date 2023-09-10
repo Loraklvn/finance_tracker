@@ -38,9 +38,12 @@ export const login = async (
     res.json({
       status: HTTP_STATUS.SUCCESS,
       data: {
-        user_id: user.user_id,
-        name: user.name,
-        email: user.email,
+        token: accessToken,
+        user_data: {
+          user_id: user.user_id,
+          name: user.name,
+          email: user.email,
+        },
       },
     });
   } catch (error) {
@@ -79,9 +82,12 @@ export const signup = async (
     res.json({
       status: HTTP_STATUS.SUCCESS,
       data: {
-        user_id: user.user_id,
-        name: user.name,
-        email: user.email,
+        token: accessToken,
+        user_data: {
+          user_id: user.user_id,
+          name: user.name,
+          email: user.email,
+        },
       },
     });
   } catch (error) {
