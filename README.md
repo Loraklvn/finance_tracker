@@ -113,6 +113,15 @@ Make sure to use the appropriate script according to your needs.
 
 Please refer to the API documentation or source code for additional details on how to use these endpoints.
 
+## Note
+
+This project currently lacks unit testing due to time constraints. While I would have preferred to include comprehensive unit tests, the project had to be submitted without them.
+
+Additionally, there are several areas where improvements could be made if more time were available.
+
+I appreciate your understanding.
+
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
