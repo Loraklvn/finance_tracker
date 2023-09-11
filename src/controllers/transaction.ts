@@ -41,7 +41,8 @@ export const getTransactions = async (
       startDate: startDate as string,
       endDate: endDate as string,
     });
-    const [transactions, total] = await transactionsQuery.getManyAndCount();
+    const transactions = await transactionsQuery.getRawMany();
+    const total = await transactionsQuery.getCount();
 
     const summaryQuery = buildGetTransactionsSummaryQuery(
       transactionRepository,
@@ -238,9 +239,20 @@ export const getTransactionsSummaryByCategory = async (
 
     const summaryIncome = await summaryIncomeQuery.getRawMany();
 
+    const summaryQuery = buildGetTransactionsSummaryQuery(
+      transactionRepository,
+      {
+        userId,
+        startDate: startDate as string,
+        endDate: endDate as string,
+      },
+    );
+    const summary = await summaryQuery.getRawOne();
+
     res.json({
       status: HTTP_STATUS.SUCCESS,
       data: {
+        ...summary,
         expenses: summaryExpenses,
         income: summaryIncome,
       },
