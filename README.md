@@ -38,13 +38,17 @@ Before you begin, ensure you have met the following requirements:
 2. Change into the project directory:
 
    ```bash
-   cd personal-finance-tracker-server
+   cd finance_tracker
    ```
 
 3. Install project dependencies:
 
    ```bash
-   yarn install
+   yarn install 
+   ```
+      or
+    ```bash
+     npm install
    ```
 
 4. Create an `.env` file in the project root directory and add the following environment variables with your own values:
@@ -75,7 +79,12 @@ To run the server, you have several scripts available in the `package.json`:
 - **Run the server in development mode (with auto-restart):**
 
   ```bash
-  yarn dev (or npm run dev)
+  yarn dev 
+  ```
+  or
+  
+  ```bash
+  npm run dev
   ```
 
 - **Watch for TypeScript file changes:**
