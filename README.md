@@ -75,7 +75,7 @@ To run the server, you have several scripts available in the `package.json`:
 - **Run the server in development mode (with auto-restart):**
 
   ```bash
-  yarn dev
+  yarn dev (or npm run dev)
   ```
 
 - **Watch for TypeScript file changes:**
