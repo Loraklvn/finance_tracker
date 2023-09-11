@@ -1,5 +1,6 @@
-import { Transaction } from 'src/entities/transaction';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+
+import { Transaction } from '../entities/transaction';
 
 // Defines the parameters for building the transaction query
 type TransactionQueryParams = {
@@ -22,8 +23,9 @@ export const buildGetTransactionsQuery = (
 ): SelectQueryBuilder<Transaction> => {
   const queryBuilder = transactionRepository
     .createQueryBuilder('transaction')
-    .select()
-    .where('transaction.user_id = :user_id', { user_id: userId })
+    .select(['transaction.*', 'category.description AS category'])
+    .leftJoin('transaction.category', 'category')
+    .where('transaction.user_id = :userId', { userId })
     .orderBy('transaction.date', 'DESC')
     .skip((page - 1) * pageSize)
     .take(pageSize);
@@ -106,6 +108,9 @@ export const buildGetTransactionsSummaryByCategoryQuery = (
       'category.description AS category',
       'transaction.type AS type',
       'SUM(transaction.amount) AS total',
+      `(SELECT MAX(sub_trans.date) FROM transaction sub_trans 
+      WHERE sub_trans.category_id = transaction.category_id) AS last_transaction_date
+      `,
     ])
     .leftJoin('transaction.category', 'category')
     .where('transaction.user_id = :userId', { userId })

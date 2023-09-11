@@ -37,7 +37,7 @@ transactionRouter.post(
   PATH_TRANSACTION,
   validateFields([
     body('amount').isNumeric().notEmpty(),
-    body('note').optional().isString().notEmpty(),
+    body('note').optional().isString(),
     body('type').isString().notEmpty().custom(validateTypeEnum),
     body('category_id').isNumeric().notEmpty(),
     body('date').isISO8601(),
@@ -49,7 +49,7 @@ transactionRouter.put(
   `${PATH_TRANSACTION}/:id`,
   validateFields([
     body('amount').optional().isNumeric().notEmpty(),
-    body('note').optional().isString().notEmpty(),
+    body('note').optional().isString(),
     body('type').optional().isString().notEmpty().custom(validateTypeEnum),
     body('category_id').optional().isNumeric().notEmpty(),
     body('date').optional().isISO8601(),
