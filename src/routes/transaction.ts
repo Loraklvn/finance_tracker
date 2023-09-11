@@ -12,6 +12,7 @@ import {
 } from '../controllers/transaction';
 import validateFields from '../middlewares/validateFields';
 import { TransactionTypes } from '../types/transaction';
+import { validateDate } from '../utils';
 
 const transactionRouter: Router = Router();
 
@@ -20,8 +21,8 @@ transactionRouter.get(
   validateFields([
     query('page').optional().isInt(),
     query('pageSize').optional().isInt(),
-    query('startDate').optional().isISO8601().toDate(),
-    query('endDate').optional().isISO8601().toDate(),
+    validateDate(query('startDate')),
+    validateDate(query('endDate')),
   ]),
   getTransactions,
 );
@@ -40,7 +41,7 @@ transactionRouter.post(
     body('note').optional().isString(),
     body('type').isString().notEmpty().custom(validateTypeEnum),
     body('category_id').isNumeric().notEmpty(),
-    body('date').isISO8601(),
+    validateDate(body('date')),
   ]),
   createTransaction,
 );
@@ -52,7 +53,7 @@ transactionRouter.put(
     body('note').optional().isString(),
     body('type').optional().isString().notEmpty().custom(validateTypeEnum),
     body('category_id').optional().isNumeric().notEmpty(),
-    body('date').optional().isISO8601(),
+    validateDate(body('date')),
   ]),
   updateTransaction,
 );
@@ -62,8 +63,8 @@ transactionRouter.delete(`${PATH_TRANSACTION}/:id`, deleteTransaction);
 transactionRouter.get(
   `${PATH_TRANSACTION}/summary`,
   validateFields([
-    query('startDate').isISO8601().toDate(),
-    query('endDate').isISO8601().toDate(),
+    validateDate(query('startDate')),
+    validateDate(query('endDate')),
   ]),
 
   getTransactionsSummary,
@@ -72,8 +73,8 @@ transactionRouter.get(
 transactionRouter.get(
   `${PATH_TRANSACTION}/summary/category`,
   validateFields([
-    query('startDate').isISO8601().toDate(),
-    query('endDate').isISO8601().toDate(),
+    validateDate(query('startDate')),
+    validateDate(query('endDate')),
   ]),
   getTransactionsSummaryByCategory,
 );

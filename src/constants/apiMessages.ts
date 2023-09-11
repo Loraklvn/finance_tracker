@@ -13,4 +13,5 @@ export const ERROR_MESSAGES = {
   TRANSACTION_NOT_FOUND: 'Transaction not found.',
   BODY_NOT_VALID: 'Invalid body fields.',
   INTERNAL_SERVER_ERROR: 'Internal server error.',
+  DATE_FORMAT_MUST_BE_YYYY_MM_DD: 'Date format must be YYYY-MM-DD',
 };
