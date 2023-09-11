@@ -28,7 +28,7 @@ export class Transaction extends BaseEntity {
   @Column({ type: 'enum', enum: TransactionTypes })
   type: TransactionTypes;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'date' })
   date: string;
 
   @Column({ type: 'int' })
